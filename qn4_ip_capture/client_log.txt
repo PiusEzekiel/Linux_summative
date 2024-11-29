@@ -1,0 +1,7 @@
+Data sent to server:
+IP and Hostnames:
+IP: 192.168.1.1, Hostname: host1
+IP: 192.168.1.2, Hostname: host2
+IP: 192.168.1.3, Hostname: host3
+IP: 192.168.1.4, Hostname: host4
+IP: 192.168.1.5, Hostname: host5
