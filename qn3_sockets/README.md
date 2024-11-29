@@ -110,7 +110,7 @@ The automation script performs the following steps:
 
 - **server.c**: The server-side implementation of the chat application.
 - **client.c**: The client-side implementation of the chat application.
-- **run_chat.sh**: Automation script to build, run, and test the chat program.
+- **test_socket_program.sh**: Automation script to build, run, and test the chat program.
 - **server_log.txt**: Log file capturing the server's activity.
 - **client_log.txt**: Log file capturing a single client's activity.
 

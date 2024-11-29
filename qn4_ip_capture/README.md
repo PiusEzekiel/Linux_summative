@@ -90,7 +90,7 @@ The `run_ip_capture.sh` script automates the following steps:
 ### **File Structure**
 - `server.c`: The C implementation of the server logic, responsible for logging IPs and hostnames.
 - `client.c`: The C implementation of the client logic, responsible for discovering devices and sending data to the server.
-- `test_automation.sh`: The automation script for building, running, and testing the program.
+- `run_ip_capture.sh`: The automation script for building, running, and testing the program.
 - `server_log.txt`: The log file capturing the server’s output.
 - `client_log.txt`: The log file capturing the client’s output.
 
