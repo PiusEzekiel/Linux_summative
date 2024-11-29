@@ -68,7 +68,7 @@ sleep 10
 # Step 6: Terminate processes
 print_header "Stopping All Processes"
 kill "$SERVER_PID" && print_success "Server stopped."
-kill "$CLIENT_PID" && print_success "Client stopped."
+# kill "$CLIENT_PID" && print_success "Client stopped."
 
 # Step 7: Display Logs
 print_header "Displaying Server Log"

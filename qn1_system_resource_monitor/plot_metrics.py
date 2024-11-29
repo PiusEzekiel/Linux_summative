@@ -15,25 +15,38 @@ def read_metrics(file_path):
             net_tx.append(int(parts[4]))
     return timestamps, cpu, memory, net_rx, net_tx
 
-# Plot metrics
-def plot_metrics(timestamps, cpu, memory, net_rx, net_tx, output_file="metrics_plot.png"):
-    plt.figure(figsize=(10, 6))
-    plt.plot(timestamps, cpu, label="CPU Usage (%)")
-    plt.plot(timestamps, memory, label="Memory Usage (%)")
-    plt.plot(timestamps, net_rx, label="Network RX (KB)")
-    plt.plot(timestamps, net_tx, label="Network TX (KB)")
-    plt.xlabel("Time")
-    plt.ylabel("Usage")
-    plt.title("System Resource Usage")
-    plt.legend()
-    plt.grid()
+# Plot both graphs in a single output file
+def plot_all(timestamps, cpu, memory, net_rx, net_tx, output_file="system_metrics_plot.png"):
+    # Create subplots: 2 rows, 1 column
+    fig, axes = plt.subplots(2, 1, figsize=(12, 10), sharex=True)
 
-    # Save the plot to a file
+    # Plot CPU and Memory usage
+    axes[0].plot(timestamps, cpu, label="CPU Usage (%)", marker="o")
+    axes[0].plot(timestamps, memory, label="Memory Usage (%)", marker="x")
+    axes[0].set_ylabel("Usage (%)")
+    axes[0].set_title("CPU and Memory Usage Over Time")
+    axes[0].legend()
+    axes[0].grid()
+
+    # Plot Network RX and TX
+    axes[1].plot(timestamps, net_rx, label="Network RX (KB)", marker="o")
+    axes[1].plot(timestamps, net_tx, label="Network TX (KB)", marker="x")
+    axes[1].set_ylabel("Data (KB)")
+    axes[1].set_xlabel("Time")
+    axes[1].set_title("Network RX and TX Over Time")
+    axes[1].legend()
+    axes[1].grid()
+
+    # Rotate X-axis labels for better readability
+    plt.xticks(rotation=45)
+
+    # Adjust layout and save the plot
+    plt.tight_layout()
     plt.savefig(output_file)
-    print(f"Plot saved as {output_file}")
+    print(f"Combined plot saved as {output_file}")
 
 # Main function
 if __name__ == "__main__":
     data_file = "usage.txt"
     timestamps, cpu, memory, net_rx, net_tx = read_metrics(data_file)
-    plot_metrics(timestamps, cpu, memory, net_rx, net_tx)
+    plot_all(timestamps, cpu, memory, net_rx, net_tx)

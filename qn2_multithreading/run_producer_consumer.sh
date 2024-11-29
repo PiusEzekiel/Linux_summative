@@ -1,18 +1,14 @@
 #!/bin/bash
 
-# Script to automate building, running, and testing the client-server socket program
+# Script to automate building, compiling, and running the producer-consumer program
 
-echo -e "\n🛠️ \033[1;32mStarting Build and Test Process for Socket Program...\033[0m\n"
+echo -e "\n🛠️ \033[1;32mStarting Build and Test Process...\033[0m\n"
 
 # Define file names and directories
-SERVER_FILE="server.c"
-CLIENT_FILE="client.c"
+C_FILE="producer_consumer.c"
 BUILD_DIR="build"
-SERVER_EXEC="server"
-CLIENT_EXEC="client"
-SERVER_LOG="server_log.txt"
-CLIENT1_LOG="client1_log.txt"
-CLIENT2_LOG="client2_log.txt"
+EXECUTABLE="producer_consumer"
+OUTPUT_FILE="producer_consumer_output.txt"
 
 # Styled output functions
 print_header() {
@@ -28,77 +24,67 @@ print_error() {
     exit 1
 }
 
-# Step 1: Clean up old build and logs
-print_header "Cleaning Up Old Build and Logs"
-rm -rf "$BUILD_DIR" "$SERVER_LOG" "$CLIENT1_LOG" "$CLIENT2_LOG"
+# Wait function for better readability
+wait_time() {
+    echo -e "\033[1;33m⏳ Waiting for 2 seconds...\033[0m"
+    sleep 2
+}
+
+# Step 1: Check for required files
+print_header "Checking Required Files"
+if [ ! -f "$C_FILE" ]; then
+    print_error "Required file '$C_FILE' is missing."
+else
+    print_success "Found '$C_FILE'."
+fi
+wait_time
+
+# Step 2: Clean up existing build directory
+print_header "Cleaning Build Directory"
+if [ -d "$BUILD_DIR" ]; then
+    rm -rf "$BUILD_DIR" && print_success "Removed existing build directory."
+else
+    print_success "No existing build directory found."
+fi
 mkdir "$BUILD_DIR" && print_success "Created new build directory."
+wait_time
 
-# Step 2: Compile server and client
-print_header "Compiling Server and Client Programs"
-if gcc -pthread "$SERVER_FILE" -o "$BUILD_DIR/$SERVER_EXEC"; then
-    print_success "Server compiled successfully."
+# Step 3: Compile the C program
+print_header "Compiling the C Program"
+if gcc -pthread "$C_FILE" -o "$BUILD_DIR/$EXECUTABLE"; then
+    print_success "C program compiled successfully."
 else
-    print_error "Error compiling server."
+    print_error "Error during C program compilation."
 fi
+wait_time
 
-if gcc -pthread "$CLIENT_FILE" -o "$BUILD_DIR/$CLIENT_EXEC"; then
-    print_success "Client compiled successfully."
-else
-    print_error "Error compiling client."
-fi
-
-# Step 3: Run server in the background
-print_header "Starting the Server"
+# Step 4: Run the Producer-Consumer Program
+print_header "Running the Producer-Consumer Program"
 cd "$BUILD_DIR"
-stdbuf -oL -eL ./"$SERVER_EXEC" > "../$SERVER_LOG" 2>&1 &
-SERVER_PID=$!
-print_success "Server started (PID: $SERVER_PID). Logs: $SERVER_LOG"
-sleep 2
+stdbuf -oL -eL ./"$EXECUTABLE" | tee "$OUTPUT_FILE" &  # Disable output buffering and stream logs to console and file
+EXEC_PID=$!
+if [ "$EXEC_PID" ]; then
+    print_success "Producer-Consumer program is running (PID: $EXEC_PID). Output is being displayed below:\n"
+else
+    print_error "Error during program execution."
+fi
 
-# Step 4: Simulate Client 1 (Ada)
-print_header "Starting Client 1 (Ada)"
-stdbuf -oL -eL ./"$CLIENT_EXEC" > "../$CLIENT1_LOG" 2>&1 <<EOF &
-Ada
-Sam
-Hi, Sam!
-EOF
-CLIENT1_PID=$!
-print_success "Client 1 (Ada) started (PID: $CLIENT1_PID). Logs: $CLIENT1_LOG"
-sleep 2
+# Step 5: Allow the program to run for 20 seconds
+wait_time
+print_header "Program Execution in Progress..."
+sleep 20
+kill "$EXEC_PID" && print_success "Stopped the program after 20 seconds."
 
-# Step 5: Simulate Client 2 (Sam)
-print_header "Starting Client 2 (Sam)"
-stdbuf -oL -eL ./"$CLIENT_EXEC" > "../$CLIENT2_LOG" 2>&1 <<EOF &
-Sam
-Ada
-Hello, Ada!
-EOF
-CLIENT2_PID=$!
-print_success "Client 2 (Sam) started (PID: $CLIENT2_PID). Logs: $CLIENT2_LOG"
-sleep 2
+# Step 6: Verify output file
+print_header "Verifying Output File"
+if [ -f "$OUTPUT_FILE" ]; then
+    print_success "Output file '$OUTPUT_FILE' is present."
+else
+    print_error "Output file '$OUTPUT_FILE' is missing."
+fi
 
-# Step 6: Wait for interactions to complete
-print_header "Allowing Clients to Communicate"
-sleep 10
-
-# Step 7: Terminate all processes
-print_header "Stopping All Processes"
-kill "$SERVER_PID" && print_success "Server stopped."
-kill "$CLIENT1_PID" && print_success "Client 1 stopped."
-kill "$CLIENT2_PID" && print_success "Client 2 stopped."
-
-# Step 8: Display Logs
-print_header "Displaying Server Log"
-cat "../$SERVER_LOG"
-
-print_header "Displaying Client 1 Log"
-cat "../$CLIENT1_LOG"
-
-print_header "Displaying Client 2 Log"
-cat "../$CLIENT2_LOG"
-
-# Final message
-print_header "Test Automation Completed"
+# Final success message
+print_header "Process Completed"
 echo -e "\033[1;34m🎉 All steps were completed successfully!🎉\033[0m\n"
 
 # Return to initial directory
